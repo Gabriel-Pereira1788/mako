@@ -55,6 +55,7 @@ jobs:
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             CODE_SIGN_STYLE=Manual \
+            ENABLE_HARDENED_RUNTIME=YES \
             build
 
       - name: Notarize app
@@ -68,12 +69,29 @@ jobs:
           # Create zip for notarization
           ditto -c -k --keepParent "$APP_PATH" Mako-notarize.zip
 
-          # Submit for notarization
-          xcrun notarytool submit Mako-notarize.zip \
+          # Submit for notarization and capture submission ID
+          SUBMISSION_OUTPUT=$(xcrun notarytool submit Mako-notarize.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait
+            --wait 2>&1)
+
+          echo "$SUBMISSION_OUTPUT"
+
+          # Extract submission ID
+          SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
+
+          # Check if notarization was successful
+          if echo "$SUBMISSION_OUTPUT" | grep -q "status: Accepted"; then
+            echo "Notarization successful!"
+          else
+            echo "Notarization failed. Fetching log..."
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_ID_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID"
+            exit 1
+          fi
 
           # Staple the notarization ticket
           xcrun stapler staple "$APP_PATH"

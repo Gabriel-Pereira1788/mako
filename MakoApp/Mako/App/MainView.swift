@@ -64,6 +64,7 @@ struct MainView: View {
         .toolbar {
             toolbarContent
         }
+        .navigationTitle("")
         .onAppear {
             setupCallbacks()
             server.start()

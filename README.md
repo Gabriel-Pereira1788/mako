@@ -9,6 +9,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Gabriel-Pereira1788/mako/releases">
+    <img src="https://img.shields.io/github/v/release/Gabriel-Pereira1788/mako?style=flat-square&label=download" alt="Download">
+  </a>
   <img src="https://img.shields.io/badge/platform-macOS-blue?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/React%20Native-0.73+-61dafb?style=flat-square&logo=react" alt="React Native">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
@@ -76,10 +79,19 @@ Mako consists of two main components:
 
 ### Installing MakoApp (macOS)
 
+#### Option 1: Download DMG (Recommended)
+
+1. Go to the [Releases page](https://github.com/Gabriel-Pereira1788/mako/releases)
+2. Download the latest `Mako-x.x.x.dmg` file
+3. Open the DMG and drag Mako to your Applications folder
+4. Launch MakoApp - it will listen for connections on port **8765**
+
+#### Option 2: Build from Source
+
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/MakoiOS.git
-   cd MakoiOS
+   git clone https://github.com/Gabriel-Pereira1788/mako.git
+   cd mako
    ```
 
 2. Open the Xcode project:
@@ -87,9 +99,7 @@ Mako consists of two main components:
    open MakoApp/Mako.xcodeproj
    ```
 
-3. Select your Mac as the target device and press **Cmd + R** to build and run.
-
-4. MakoApp will start and listen for connections on port **8765**.
+3. Select your Mac as the target and press **Cmd + R** to build and run.
 
 ### Installing React Native SDK
 
@@ -236,7 +246,7 @@ We welcome contributions! Here's how you can help:
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/your-username/MakoiOS.git
+   git clone https://github.com/your-username/mako.git
    ```
 3. Create a new branch:
    ```bash

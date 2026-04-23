@@ -10,6 +10,7 @@ import SwiftUI
 struct WorkspaceView: View {
     @Bindable var workspaceState: WorkspaceState
     let deviceManager: DeviceManager
+    let filterManager: FilterManager
 
     var body: some View {
         Group {
@@ -44,6 +45,7 @@ struct WorkspaceView: View {
             PanelView(
                 panel: panel,
                 deviceManager: deviceManager,
+                filterManager: filterManager,
                 onSelectTab: { tabId in
                     workspaceState.setActiveTab(id: tabId, inPanelId: panel.id)
                 },
@@ -77,6 +79,7 @@ struct WorkspaceView: View {
         PanelView(
             panel: panel,
             deviceManager: deviceManager,
+            filterManager: filterManager,
             onSelectTab: { tabId in
                 workspaceState.setActiveTab(id: tabId, inPanelId: panel.id)
             },
@@ -100,8 +103,8 @@ struct WorkspaceView: View {
             workspaceState.setActivePanel(panel.id)
         }
         .border(
-            workspaceState.activePanelId == panel.id ? Color.accentColor.opacity(0.5) : Color.clear,
-            width: 2
+            workspaceState.activePanelId == panel.id ? AppStyle.Panel.activeBorderColor : Color.clear,
+            width: AppStyle.Panel.activeBorderWidth
         )
     }
 }

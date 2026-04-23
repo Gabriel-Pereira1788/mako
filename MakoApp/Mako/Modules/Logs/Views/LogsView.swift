@@ -7,11 +7,24 @@ import SwiftUI
 
 struct LogsView: View {
     @Bindable var viewModel: LogsViewModel
+    @Bindable var filterContext: FilterContext
+
+    private var filteredLogs: [LogEntry] {
+        viewModel.logs.filter { entry in
+            let matchesSearch = filterContext.searchText.isEmpty ||
+                entry.message.localizedStandardContains(filterContext.searchText)
+            let matchesLevel = filterContext.selectedLevel == nil ||
+                entry.logLevel == filterContext.selectedLevel
+            let matchesSource = filterContext.selectedSource == nil ||
+                entry.logSource == filterContext.selectedSource
+            return matchesSearch && matchesLevel && matchesSource
+        }
+    }
 
     var body: some View {
         VSplitView {
             VStack(spacing: 0) {
-                filterBar
+                statusBar
                 Divider()
                 logList
             }
@@ -28,60 +41,14 @@ struct LogsView: View {
 
     // MARK: - Subviews
 
-    private var filterBar: some View {
+    private var statusBar: some View {
         HStack(spacing: 12) {
-            searchField
-            levelPicker
-            sourcePicker
             Spacer()
             deviceBadge
             countLabel
         }
-        .padding()
-    }
-
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            TextField("Search logs...", text: $viewModel.searchText)
-                .textFieldStyle(.plain)
-
-            if !viewModel.searchText.isEmpty {
-                Button("Clear Search", systemImage: "xmark.circle.fill") {
-                    viewModel.clearSearch()
-                }
-                .labelStyle(.iconOnly)
-                .foregroundStyle(.secondary)
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(8)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var levelPicker: some View {
-        Picker("Level", selection: $viewModel.selectedLevel) {
-            Text("All Levels").tag(nil as LogLevel?)
-            Divider()
-            ForEach(LogLevel.allCases, id: \.self) { level in
-                Label(level.rawValue.capitalized, systemImage: level.icon)
-                    .tag(level as LogLevel?)
-            }
-        }
-        .frame(width: 130)
-    }
-
-    private var sourcePicker: some View {
-        Picker("Source", selection: $viewModel.selectedSource) {
-            Text("All Sources").tag(nil as LogSource?)
-            Divider()
-            ForEach(LogSource.allCases, id: \.self) { source in
-                Text(source.displayName).tag(source as LogSource?)
-            }
-        }
-        .frame(width: 130)
+        .padding(.horizontal, AppStyle.Spacing.large)
+        .padding(.vertical, AppStyle.Spacing.small)
     }
 
     @ViewBuilder
@@ -98,15 +65,15 @@ struct LogsView: View {
     }
 
     private var countLabel: some View {
-        Text("\(viewModel.filteredCount) logs")
+        Text("\(filteredLogs.count) logs")
             .font(.caption)
             .foregroundStyle(.secondary)
     }
 
     private var logList: some View {
         Group {
-            if viewModel.hasFilteredLogs {
-                List(viewModel.filteredLogs) { entry in
+            if !filteredLogs.isEmpty {
+                List(filteredLogs) { entry in
                     LogRowView(entry: entry)
                         .contentShape(Rectangle())
                         .listRowBackground(
@@ -137,8 +104,4 @@ struct LogsView: View {
             }
         }
     }
-}
-
-#Preview {
-    LogsView(viewModel: LogsViewModel(logs: [], deviceName: "Test Device"))
 }

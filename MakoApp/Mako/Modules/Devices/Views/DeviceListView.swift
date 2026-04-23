@@ -12,24 +12,11 @@ struct DeviceListView: View {
     @Binding var selectedDevice: Device?
     let onClearDevice: (Device) -> Void
 
+    @State private var selectedId: String?
+
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text("Devices")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(devices.count)")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.2))
-                    .clipShape(Capsule())
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-
+            header
             Divider()
 
             if devices.isEmpty {
@@ -38,6 +25,33 @@ struct DeviceListView: View {
                 deviceList
             }
         }
+        .onAppear {
+            selectedId = selectedDevice?.id
+        }
+        .onChange(of: selectedId) { _, newId in
+            selectedDevice = devices.first { $0.id == newId }
+        }
+        .onChange(of: selectedDevice) { _, newDevice in
+            selectedId = newDevice?.id
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            Text("Devices")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text("\(devices.count)")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 2)
+                .background(Color.secondary.opacity(0.2))
+                .clipShape(Capsule())
+        }
+        .padding(.horizontal, AppStyle.Spacing.extraLarge)
+        .padding(.vertical, AppStyle.Spacing.large)
     }
 
     private var emptyState: some View {
@@ -60,27 +74,17 @@ struct DeviceListView: View {
     }
 
     private var deviceList: some View {
-        ScrollView {
-            LazyVStack(spacing: 4) {
-                ForEach(devices, id: \.id) { device in
-                    Button {
-                        selectedDevice = device
-                    } label: {
-                        DeviceRowView(
-                            device: device,
-                            isSelected: selectedDevice?.id == device.id
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        Button("Clear Logs") {
-                            onClearDevice(device)
-                        }
-                    }
-                }
+        List(devices, id: \.id, selection: $selectedId) { device in
+            DeviceRowView(
+                device: device,
+                isSelected: selectedDevice?.id == device.id
+            )
+            .tag(device.id)
+            .contextMenu {
+                Button("Clear Logs", action: { onClearDevice(device) })
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 8)
         }
+        .listStyle(.sidebar)
+        .scrollContentBackground(.hidden)
     }
 }

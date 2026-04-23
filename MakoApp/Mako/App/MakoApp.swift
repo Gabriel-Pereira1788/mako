@@ -34,6 +34,14 @@ struct MakoApp: App {
         }
         .modelContainer(sharedModelContainer)
         .windowStyle(.automatic)
+        .windowResizability(.contentMinSize)
         .defaultSize(width: 1200, height: 700)
+        .commands {
+            AppMenuCommands()
+        }
+
+        Settings {
+            SettingsView()
+        }
     }
 }

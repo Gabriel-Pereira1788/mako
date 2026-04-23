@@ -12,6 +12,10 @@ struct TabItemView: View {
     let isActive: Bool
     let onSelect: () -> Void
     let onClose: () -> Void
+    var onCloseOthers: (() -> Void)? = nil
+    var onCloseToRight: (() -> Void)? = nil
+    var onMoveToNewPanel: (() -> Void)? = nil
+    var canMoveToNewPanel: Bool = false
 
     @State private var isHovering = false
 
@@ -27,12 +31,6 @@ struct TabItemView: View {
                     .foregroundStyle(isActive ? .primary : .secondary)
                     .lineLimit(1)
 
-                Button("Close Tab", systemImage: "xmark", action: onClose)
-                    .labelStyle(.iconOnly)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .buttonStyle(.plain)
-                    .opacity(isHovering || isActive ? 1 : 0)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -48,9 +46,38 @@ struct TabItemView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
         .onHover { hovering in
             isHovering = hovering
         }
+        .contextMenu {
+            Button("Close Tab") {
+                onClose()
+            }
+            .keyboardShortcut("w", modifiers: .command)
+
+            if let onCloseOthers {
+                Button("Close Other Tabs") {
+                    onCloseOthers()
+                }
+            }
+
+            if let onCloseToRight {
+                Button("Close Tabs to the Right") {
+                    onCloseToRight()
+                }
+            }
+
+            if canMoveToNewPanel, let onMoveToNewPanel {
+                Divider()
+
+                Button("Move to New Panel") {
+                    onMoveToNewPanel()
+                }
+            }
+        }
+        .accessibilityLabel("\(tab.type.displayName) tab")
+        .accessibilityHint(isActive ? "Currently active" : "Double-tap to switch to this tab")
+        .accessibilityAddTraits(.isButton)
     }
 }

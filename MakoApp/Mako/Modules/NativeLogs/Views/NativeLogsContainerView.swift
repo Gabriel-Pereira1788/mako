@@ -10,6 +10,7 @@ import SwiftData
 
 struct NativeLogsContainerView: View {
     let device: Device?
+    let filterContext: FilterContext
 
     @Query private var allLogs: [LogEntry]
     @State private var viewModel: NativeLogsViewModel
@@ -22,8 +23,9 @@ struct NativeLogsContainerView: View {
             .sorted { $0.timestamp > $1.timestamp }
     }
 
-    init(device: Device?) {
+    init(device: Device?, filterContext: FilterContext) {
         self.device = device
+        self.filterContext = filterContext
         _viewModel = State(initialValue: NativeLogsViewModel(
             logs: [],
             deviceName: device?.name,
@@ -32,7 +34,7 @@ struct NativeLogsContainerView: View {
     }
 
     var body: some View {
-        NativeLogsView(viewModel: viewModel)
+        NativeLogsView(viewModel: viewModel, filterContext: filterContext)
             .task {
                 viewModel.updateLogs(filteredLogs)
             }

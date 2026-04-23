@@ -11,6 +11,8 @@ struct DeviceRowView: View {
     let device: Device
     let isSelected: Bool
 
+    @State private var isHovering = false
+
     var body: some View {
         HStack(spacing: 12) {
             platformIcon
@@ -18,13 +20,25 @@ struct DeviceRowView: View {
             Spacer()
             connectionIndicator
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
+        .padding(.vertical, AppStyle.Spacing.medium)
+        .padding(.horizontal, AppStyle.Spacing.large)
         .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+            RoundedRectangle(cornerRadius: AppStyle.Border.radius)
+                .fill(rowBackgroundColor)
         )
         .contentShape(Rectangle())
+        .onHover { hovering in
+            isHovering = hovering
+        }
+    }
+
+    private var rowBackgroundColor: Color {
+        if isSelected {
+            return Color.accentColor.opacity(0.2)
+        } else if isHovering {
+            return Color.secondary.opacity(0.1)
+        }
+        return Color.clear
     }
 
     // MARK: - Subviews

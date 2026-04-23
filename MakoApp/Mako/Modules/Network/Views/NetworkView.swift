@@ -7,11 +7,22 @@ import SwiftUI
 
 struct NetworkView: View {
     @Bindable var viewModel: NetworkViewModel
+    @Bindable var filterContext: FilterContext
+
+    private var filteredEntries: [NetworkEntry] {
+        viewModel.entries.filter { entry in
+            let matchesSearch = filterContext.searchText.isEmpty ||
+                entry.url.localizedStandardContains(filterContext.searchText)
+            let matchesMethod = filterContext.selectedMethod == nil ||
+                entry.method.uppercased() == filterContext.selectedMethod
+            return matchesSearch && matchesMethod
+        }
+    }
 
     var body: some View {
         VSplitView {
             VStack(spacing: 0) {
-                filterBar
+                statusBar
                 Divider()
                 networkList
             }
@@ -29,47 +40,14 @@ struct NetworkView: View {
 
     // MARK: - Subviews
 
-    private var filterBar: some View {
+    private var statusBar: some View {
         HStack(spacing: 12) {
-            searchField
-            methodPicker
             Spacer()
             deviceBadge
             countLabel
         }
-        .padding()
-    }
-
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            TextField("Search URLs...", text: $viewModel.searchText)
-                .textFieldStyle(.plain)
-
-            if !viewModel.searchText.isEmpty {
-                Button("Clear Search", systemImage: "xmark.circle.fill") {
-                    viewModel.clearSearch()
-                }
-                .labelStyle(.iconOnly)
-                .foregroundStyle(.secondary)
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(8)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var methodPicker: some View {
-        Picker("Method", selection: $viewModel.selectedMethod) {
-            Text("All Methods").tag(nil as String?)
-            Divider()
-            ForEach(viewModel.availableMethods, id: \.self) { method in
-                Text(method).tag(method as String?)
-            }
-        }
-        .frame(width: 130)
+        .padding(.horizontal, AppStyle.Spacing.large)
+        .padding(.vertical, AppStyle.Spacing.small)
     }
 
     @ViewBuilder
@@ -86,15 +64,15 @@ struct NetworkView: View {
     }
 
     private var countLabel: some View {
-        Text("\(viewModel.filteredCount) requests")
+        Text("\(filteredEntries.count) requests")
             .font(.caption)
             .foregroundStyle(.secondary)
     }
 
     private var networkList: some View {
         Group {
-            if viewModel.hasFilteredEntries {
-                List(viewModel.filteredEntries) { entry in
+            if !filteredEntries.isEmpty {
+                List(filteredEntries) { entry in
                     NetworkRowView(entry: entry)
                         .contentShape(Rectangle())
                         .listRowBackground(

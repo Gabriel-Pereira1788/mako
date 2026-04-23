@@ -94,6 +94,51 @@ final class WorkspaceViewModel {
         activePanelId = inPanelId
     }
 
+    func closeOtherTabs(keepingTabId tabId: UUID, inPanelId: UUID) {
+        guard let panelIndex = panels.firstIndex(where: { $0.id == inPanelId }) else {
+            return
+        }
+
+        panels[panelIndex].tabs.removeAll { $0.id != tabId }
+        panels[panelIndex].activeTabId = tabId
+    }
+
+    func closeTabsToRight(of tabId: UUID, inPanelId: UUID) {
+        guard let panelIndex = panels.firstIndex(where: { $0.id == inPanelId }),
+              let tabIndex = panels[panelIndex].tabs.firstIndex(where: { $0.id == tabId }) else {
+            return
+        }
+
+        let tabsToKeep = Array(panels[panelIndex].tabs.prefix(through: tabIndex))
+        panels[panelIndex].tabs = tabsToKeep
+
+        if let activeId = panels[panelIndex].activeTabId,
+           !tabsToKeep.contains(where: { $0.id == activeId }) {
+            panels[panelIndex].activeTabId = tabId
+        }
+    }
+
+    func moveTabToNewPanel(tabId: UUID, fromPanelId: UUID) {
+        guard canSplit,
+              let fromPanelIndex = panels.firstIndex(where: { $0.id == fromPanelId }),
+              let tab = panels[fromPanelIndex].tabs.first(where: { $0.id == tabId }) else {
+            return
+        }
+
+        // Remove from source panel
+        panels[fromPanelIndex].tabs.removeAll { $0.id == tabId }
+        if panels[fromPanelIndex].activeTabId == tabId {
+            panels[fromPanelIndex].activeTabId = panels[fromPanelIndex].tabs.first?.id
+        }
+
+        // Create new panel and add the tab
+        var newPanel = Panel()
+        newPanel.tabs = [tab]
+        newPanel.activeTabId = tab.id
+        panels.append(newPanel)
+        activePanelId = newPanel.id
+    }
+
     // MARK: - Device Actions
 
     func openDeviceTabs(deviceId: String) {

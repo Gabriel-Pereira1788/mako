@@ -11,8 +11,18 @@ import SwiftData
 struct PanelView: View {
     let panel: Panel
     let deviceManager: DeviceManager
+    let filterManager: FilterManager
     let onSelectTab: (UUID) -> Void
     let onCloseTab: (UUID) -> Void
+    var onCloseOtherTabs: ((UUID) -> Void)? = nil
+    var onCloseTabsToRight: ((UUID) -> Void)? = nil
+    var onMoveToNewPanel: ((UUID) -> Void)? = nil
+    var canMoveToNewPanel: Bool = false
+    var onSplitHorizontal: (() -> Void)? = nil
+    var onSplitVertical: (() -> Void)? = nil
+    var onClosePanel: (() -> Void)? = nil
+    var canSplit: Bool = false
+    var canClosePanel: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,7 +30,11 @@ struct PanelView: View {
                 tabs: panel.tabs,
                 activeTabId: panel.activeTabId,
                 onSelectTab: onSelectTab,
-                onCloseTab: onCloseTab
+                onCloseTab: onCloseTab,
+                onCloseOtherTabs: onCloseOtherTabs,
+                onCloseTabsToRight: onCloseTabsToRight,
+                onMoveToNewPanel: onMoveToNewPanel,
+                canMoveToNewPanel: canMoveToNewPanel
             )
 
             Divider()
@@ -31,19 +45,43 @@ struct PanelView: View {
                 emptyState
             }
         }
+        .contextMenu {
+            if canSplit {
+                Button("Split Horizontal") {
+                    onSplitHorizontal?()
+                }
+                .keyboardShortcut("d", modifiers: [.command, .shift])
+
+                Button("Split Vertical") {
+                    onSplitVertical?()
+                }
+                .keyboardShortcut("d", modifiers: [.command, .option])
+            }
+
+            if canClosePanel {
+                if canSplit {
+                    Divider()
+                }
+
+                Button("Close Panel") {
+                    onClosePanel?()
+                }
+            }
+        }
     }
 
     @ViewBuilder
     private func tabContent(for tab: Tab) -> some View {
         let device = deviceManager.getDevice(id: tab.deviceId)
+        let filterContext = filterManager.context(for: tab)
 
         switch tab.type {
         case .logs:
-            LogsContentView(device: device)
+            LogsContentView(device: device, filterContext: filterContext)
         case .network:
-            NetworkContentView(device: device)
+            NetworkContentView(device: device, filterContext: filterContext)
         case .nativeLogs:
-            NativeLogsContentView(device: device)
+            NativeLogsContentView(device: device, filterContext: filterContext)
         }
     }
 

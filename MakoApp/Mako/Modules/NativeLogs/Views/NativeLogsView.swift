@@ -7,11 +7,22 @@ import SwiftUI
 
 struct NativeLogsView: View {
     @Bindable var viewModel: NativeLogsViewModel
+    @Bindable var filterContext: FilterContext
+
+    private var filteredLogs: [LogEntry] {
+        viewModel.logs.filter { entry in
+            let matchesSearch = filterContext.searchText.isEmpty ||
+                entry.message.localizedStandardContains(filterContext.searchText)
+            let matchesLevel = filterContext.selectedLevel == nil ||
+                entry.logLevel == filterContext.selectedLevel
+            return matchesSearch && matchesLevel
+        }
+    }
 
     var body: some View {
         VSplitView {
             VStack(spacing: 0) {
-                filterBar
+                statusBar
                 Divider()
                 logList
             }
@@ -28,16 +39,15 @@ struct NativeLogsView: View {
 
     // MARK: - Subviews
 
-    private var filterBar: some View {
+    private var statusBar: some View {
         HStack(spacing: 12) {
             platformBadge
-            searchField
-            levelPicker
             Spacer()
             deviceBadge
             countLabel
         }
-        .padding()
+        .padding(.horizontal, AppStyle.Spacing.large)
+        .padding(.vertical, AppStyle.Spacing.small)
     }
 
     private var platformBadge: some View {
@@ -51,7 +61,7 @@ struct NativeLogsView: View {
         .padding(.vertical, 4)
         .background(platformBackgroundColor)
         .foregroundStyle(platformForegroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .clipShape(.rect(cornerRadius: 6))
     }
 
     private var platformBackgroundColor: Color {
@@ -70,39 +80,6 @@ struct NativeLogsView: View {
         }
     }
 
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            TextField("Search native logs...", text: $viewModel.searchText)
-                .textFieldStyle(.plain)
-
-            if !viewModel.searchText.isEmpty {
-                Button("Clear Search", systemImage: "xmark.circle.fill") {
-                    viewModel.clearSearch()
-                }
-                .labelStyle(.iconOnly)
-                .foregroundStyle(.secondary)
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(8)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var levelPicker: some View {
-        Picker("Level", selection: $viewModel.selectedLevel) {
-            Text("All Levels").tag(nil as LogLevel?)
-            Divider()
-            ForEach(LogLevel.allCases, id: \.self) { level in
-                Label(level.rawValue.capitalized, systemImage: level.icon)
-                    .tag(level as LogLevel?)
-            }
-        }
-        .frame(width: 130)
-    }
-
     @ViewBuilder
     private var deviceBadge: some View {
         if let deviceName = viewModel.deviceName {
@@ -117,15 +94,15 @@ struct NativeLogsView: View {
     }
 
     private var countLabel: some View {
-        Text("\(viewModel.filteredCount) logs")
+        Text("\(filteredLogs.count) logs")
             .font(.caption)
             .foregroundStyle(.secondary)
     }
 
     private var logList: some View {
         Group {
-            if viewModel.hasFilteredLogs {
-                List(viewModel.filteredLogs) { entry in
+            if !filteredLogs.isEmpty {
+                List(filteredLogs) { entry in
                     LogRowView(entry: entry)
                         .contentShape(Rectangle())
                         .listRowBackground(
@@ -156,12 +133,4 @@ struct NativeLogsView: View {
             }
         }
     }
-}
-
-#Preview {
-    NativeLogsView(viewModel: NativeLogsViewModel(
-        logs: [],
-        deviceName: "iPhone 15 Pro",
-        platform: .ios
-    ))
 }

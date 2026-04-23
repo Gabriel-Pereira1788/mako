@@ -22,13 +22,13 @@ struct RightSidebarView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, AppStyle.Spacing.extraLarge)
+            .padding(.vertical, AppStyle.Spacing.large)
 
             Divider()
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: AppStyle.Spacing.extraLarge) {
                     // Open tabs section
                     if selectedDevice != nil {
                         openTabsSection
@@ -41,14 +41,13 @@ struct RightSidebarView: View {
 
                     Spacer()
                 }
-                .padding(16)
+                .padding(AppStyle.Spacing.extraLarge)
             }
         }
-        .frame(width: 200)
     }
 
     private var openTabsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppStyle.Spacing.medium) {
             Text("Open Tab")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
@@ -80,7 +79,7 @@ struct RightSidebarView: View {
     }
 
     private var splitSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppStyle.Spacing.medium) {
             Text("Split Panel")
                 .font(.caption)
                 .foregroundStyle(.tertiary)

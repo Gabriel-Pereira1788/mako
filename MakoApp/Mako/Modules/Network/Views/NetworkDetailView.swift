@@ -33,6 +33,9 @@ struct NetworkDetailView: View {
             }
         }
         .frame(minWidth: 400, minHeight: 400)
+        .task(id: viewModel.entry.id) {
+            await viewModel.loadFormattedBodies()
+        }
     }
 
     // MARK: - Header
@@ -97,8 +100,10 @@ struct NetworkDetailView: View {
                 sectionWithCopy(title: "Headers", content: headers)
             }
 
-            if let body = viewModel.formattedRequestBody {
-                sectionWithCopy(title: "Body", content: body)
+            if viewModel.isLoadingBody && viewModel.entry.requestBody != nil {
+                bodyLoadingView
+            } else if let body = viewModel.formattedRequestBodyAsync {
+                bodySectionWithCopy(title: "Body", content: body)
             }
 
             if !viewModel.hasRequestData {
@@ -116,8 +121,10 @@ struct NetworkDetailView: View {
                 sectionWithCopy(title: "Headers", content: headers)
             }
 
-            if let body = viewModel.formattedResponseBody {
-                sectionWithCopy(title: "Body", content: body)
+            if viewModel.isLoadingBody && viewModel.entry.responseBody != nil {
+                bodyLoadingView
+            } else if let body = viewModel.formattedResponseBodyAsync {
+                bodySectionWithCopy(title: "Body", content: body)
             }
 
             if !viewModel.hasResponseData {
@@ -134,6 +141,17 @@ struct NetworkDetailView: View {
                 }
             }
         }
+    }
+
+    private var bodyLoadingView: some View {
+        HStack {
+            ProgressView()
+                .scaleEffect(0.8)
+            Text("Formatting...")
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding()
     }
 
     // MARK: - Reusable Components
@@ -171,5 +189,32 @@ struct NetworkDetailView: View {
             .padding()
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func bodySectionWithCopy(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Button {
+                    viewModel.copyToClipboard(content)
+                } label: {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Copy to clipboard")
+            }
+
+            LargeTextView(text: content)
+                .frame(minHeight: 100, maxHeight: 400)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
     }
 }

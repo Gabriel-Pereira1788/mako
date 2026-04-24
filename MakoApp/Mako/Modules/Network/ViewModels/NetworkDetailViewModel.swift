@@ -22,6 +22,9 @@ final class NetworkDetailViewModel {
     // MARK: - State
 
     var selectedTab: NetworkDetailTab = .request
+    var isLoadingBody = false
+    var formattedRequestBodyAsync: String?
+    var formattedResponseBodyAsync: String?
 
     // MARK: - Computed Properties
 
@@ -81,5 +84,40 @@ final class NetworkDetailViewModel {
     func copyToClipboard(_ content: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(content, forType: .string)
+    }
+
+    // MARK: - Async Loading
+
+    func loadFormattedBodies() async {
+        isLoadingBody = true
+
+        // Capture values on MainActor before background processing
+        let requestBody = entry.requestBody
+        let responseBody = entry.responseBody
+
+        // Format in background using static function
+        async let formattedRequest = Self.formatInBackground(requestBody)
+        async let formattedResponse = Self.formatInBackground(responseBody)
+
+        formattedRequestBodyAsync = await formattedRequest
+        formattedResponseBodyAsync = await formattedResponse
+        isLoadingBody = false
+    }
+
+    private nonisolated static func formatInBackground(_ body: String?) async -> String? {
+        guard let body else { return nil }
+        return await Task.detached(priority: .userInitiated) {
+            formatJSON(body)
+        }.value
+    }
+
+    private nonisolated static func formatJSON(_ string: String) -> String {
+        guard let data = string.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data),
+              let formatted = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
+              let result = String(data: formatted, encoding: .utf8) else {
+            return string
+        }
+        return result
     }
 }

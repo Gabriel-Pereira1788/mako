@@ -1,31 +1,9 @@
 PODS:
-  - AsyncStorage (3.0.2):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - FBLazyVector (0.84.1)
   - hermes-engine (250829098.0.9):
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
-  - NitroMako (0.1.2):
+  - NitroMako (0.1.3):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -1923,12 +1901,9 @@ PODS:
     - React-utils (= 0.84.1)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.84.1)
-  - RNDeviceInfo (15.0.2):
-    - React-Core
   - Yoga (0.0.0)
 
 DEPENDENCIES:
-  - "AsyncStorage (from `../../node_modules/@react-native-async-storage/async-storage`)"
   - FBLazyVector (from `../../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - NitroMako (from `../..`)
@@ -2005,12 +1980,9 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
-  - RNDeviceInfo (from `../../node_modules/react-native-device-info`)
   - Yoga (from `../../node_modules/react-native/ReactCommon/yoga`)
 
 EXTERNAL SOURCES:
-  AsyncStorage:
-    :path: "../../node_modules/@react-native-async-storage/async-storage"
   FBLazyVector:
     :path: "../../node_modules/react-native/Libraries/FBLazyVector"
   hermes-engine:
@@ -2162,16 +2134,13 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon"
   ReactNativeDependencies:
     :podspec: "../../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
-  RNDeviceInfo:
-    :path: "../../node_modules/react-native-device-info"
   Yoga:
     :path: "../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AsyncStorage: 2e1d431842588f5af845737e6435c1fcbecdab51
   FBLazyVector: e97c19a5a442429d1988f182a1940fb08df514da
   hermes-engine: 95018d9098c779eb7db5f302eee3e91750939e88
-  NitroMako: 1145843722538b29e956d6d7b11b2de368898607
+  NitroMako: c63d13cc3c1850e22a8d61bbc28de06c306a27d2
   NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
@@ -2244,7 +2213,6 @@ SPEC CHECKSUMS:
   ReactCodegen: c00d0836354d71c00275db9fb1c70dee27cdab44
   ReactCommon: 07572bf9e687c8a52fbe4a3641e9e3a1a477c78e
   ReactNativeDependencies: b91d48867e28936d2748803e282646a43de4b706
-  RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   Yoga: c0b3f2c7e8d3e327e450223a2414ca3fa296b9a2
 
 PODFILE CHECKSUM: a0c903de13dab8eee11fca6544fcb3049119b247

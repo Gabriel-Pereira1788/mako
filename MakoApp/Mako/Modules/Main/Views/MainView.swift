@@ -8,11 +8,16 @@ import SwiftData
 
 struct MainView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var viewModel: MainViewModel
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var searchText = ""
     @AppStorage("showRightSidebar") private var showRightSidebar = true
+
+    private var isSidebarHidden: Bool {
+        columnVisibility == .detailOnly
+    }
 
     init(modelContext: ModelContext) {
         _viewModel = State(wrappedValue: MainViewModel(modelContext: modelContext))
@@ -27,14 +32,17 @@ struct MainView: View {
             ZStack{
                 VStack(spacing:10) {
                     CustomToolBar(viewModel: viewModel)
-                    
+
                     WorkspaceView(
                         workspaceState: viewModel.workspaceState,
                         deviceManager: viewModel.deviceManager,
                         filterManager: viewModel.filterManager
                     )
                     .background(AppStyle.Background.primary)
-                }.padding(20)
+                }
+                .padding(20)
+                .offset(y: isSidebarHidden ? 30 : 0)
+                .animation(reduceMotion ? .none : .spring(duration: 0.3), value: isSidebarHidden)
                 
             }.toolbar(removing: .title)
                 .toolbarBackground(.hidden, for: .windowToolbar)

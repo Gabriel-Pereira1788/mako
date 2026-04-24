@@ -5,18 +5,23 @@ import { Mako } from 'mako-react-native'
 function App(): React.JSX.Element {
   useEffect(() => {
     if (__DEV__) {
-      Mako.connect({ host: '192.168.0.3' })
+      Mako.connect({ host: '192.168.0.2' })
       setTimeout(() => {
-        Mako.log('TESTE')
+        Mako.log('FIRST-LOG')
       }, 2000)
     }
   }, [])
   return (
     <View style={styles.container}>
       <Text style={styles.text}></Text>
-      <Button title='Teste' onPress={() => {
-        Mako.log('TESTE-2')
-      }} />
+      <Button
+        title="Test"
+        onPress={() => {
+          fetch('https://jsonplaceholder.typicode.com/todos/1')
+            .then(response => response.json())
+            .then(json => Mako.log("RESPONSE-API",json))
+        }}
+      />
     </View>
   )
 }

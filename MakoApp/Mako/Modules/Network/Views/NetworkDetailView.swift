@@ -213,7 +213,7 @@ struct NetworkDetailView: View {
             }
 
             LargeTextView(text: content)
-                .frame(minHeight: 100, maxHeight: 400)
+                .frame(minHeight: 300, maxHeight: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }

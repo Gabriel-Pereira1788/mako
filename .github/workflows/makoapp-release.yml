@@ -2,11 +2,6 @@ name: Release MakoApp
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number (e.g., 1.0.0)'
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -22,6 +17,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install npm dependencies
+        working-directory: MakoApp
+        run: npm install
+
+      - name: Get next version (dry-run)
+        id: version
+        working-directory: MakoApp
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUTPUT=$(npx semantic-release --dry-run 2>&1) || true
+          echo "$OUTPUT"
+          VERSION=$(echo "$OUTPUT" | grep -E "The next release version is" | sed -E 's/.*The next release version is ([0-9]+\.[0-9]+\.[0-9]+).*/\1/' || echo "")
+          if [ -z "$VERSION" ]; then
+            echo "No new version to release. Check if there are commits following Conventional Commits format."
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -111,15 +134,17 @@ jobs:
             --icon-size 100 \
             --icon "Mako.app" 150 190 \
             --app-drop-link 450 190 \
-            "Mako-${{ inputs.version }}.dmg" \
+            "Mako-${{ steps.version.outputs.version }}.dmg" \
             "MakoApp/build/Build/Products/Release/Mako.app"
 
-      - name: Create Release with Auto Notes
+      - name: Release (creates tag and GitHub release)
+        working-directory: MakoApp
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Upload DMG to release
         uses: softprops/action-gh-release@v2
         with:
-          name: "MakoApp v${{ inputs.version }}"
-          tag_name: "makoapp-v${{ inputs.version }}"
-          generate_release_notes: true
+          tag_name: "makoapp-v${{ steps.version.outputs.version }}"
           files: Mako-*.dmg
-          draft: false
-          prerelease: false

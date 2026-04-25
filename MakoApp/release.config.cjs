@@ -1,8 +1,8 @@
 const rules = [
   { type: 'feat', release: 'minor', title: '✨ Features' },
   { type: 'fix', release: 'patch', title: '🐛 Bug Fixes' },
-  { type: 'perf', release: 'patch', title: '💨 Performance Improvements' },
-  { type: 'refactor', release: 'patch', title: '🔄 Code Refactors' },
+  { type: 'perf', release: 'patch', title: '💨 Performance' },
+  { type: 'refactor', release: 'patch', title: '🔄 Refactors' },
   { type: 'docs', release: 'patch', title: '📚 Documentation' },
   { type: 'chore', release: 'patch', title: '🛠️ Other changes' },
 ]
@@ -15,7 +15,8 @@ const sortMap = Object.fromEntries(
  * @type {import('semantic-release').GlobalConfig}
  */
 module.exports = {
-  branches: ['main', { name: 'next', prerelease: 'next' }],
+  branches: ['main'],
+  tagFormat: 'makoapp-v${version}',
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -48,11 +49,18 @@ module.exports = {
         changelogFile: 'CHANGELOG.md',
       },
     ],
-    '@semantic-release/npm',
+    [
+      '@semantic-release/exec',
+      {
+        prepareCmd: 'echo "Releasing MakoApp version ${nextRelease.version}"',
+      },
+    ],
+    '@semantic-release/github',
     [
       '@semantic-release/git',
       {
-        assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
+        assets: ['CHANGELOG.md', 'package.json'],
+        message: 'chore(release): makoapp ${nextRelease.version}',
       },
     ],
   ],

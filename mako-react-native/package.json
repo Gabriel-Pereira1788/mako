@@ -42,11 +42,15 @@
   "workspaces": [
     "example"
   ],
-  "repository": "https://github.com/gabriel-pereira1788/mako-react-native.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gabriel-Pereira1788/mako.git",
+    "directory": "mako-react-native"
+  },
   "author": "Gabriel-Pereira1788",
   "license": "MIT",
-  "bugs": "https://github.com/gabriel-pereira1788/mako-react-native/issues",
-  "homepage": "https://github.com/gabriel-pereira1788/mako-react-native#readme",
+  "bugs": "https://github.com/Gabriel-Pereira1788/mako/issues",
+  "homepage": "https://github.com/Gabriel-Pereira1788/mako/tree/main/mako-react-native#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

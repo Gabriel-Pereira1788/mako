@@ -15,9 +15,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+      contents: read
       id-token: write
     defaults:
       run:
@@ -25,20 +23,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Fetch all tags
-        run: git fetch --tags origin
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Setup Bun.js
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
       - name: Cache bun dependencies
         id: bun-cache
         uses: actions/cache@v4
@@ -48,19 +44,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      - name: Install npm dependencies (bun)
+      - name: Install dependencies
         run: bun install
 
       - name: Build lib
         run: bun run build
 
-      - name: Release
+      - name: Publish to npm
+        run: npm publish --provenance --access public
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-          GIT_AUTHOR_NAME: ${{ github.actor }}
-          GIT_AUTHOR_EMAIL: '${{ github.actor }}@users.noreply.github.com'
-          GIT_COMMITTER_NAME: ${{ github.actor }}
-          GIT_COMMITTER_EMAIL: '${{ github.actor }}@users.noreply.github.com'
-        run: bun release
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

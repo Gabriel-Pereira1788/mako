@@ -1,29 +1,90 @@
-# react-native-nitro-trace
+# mako-react-native
 
-react-native-nitro-trace is a react native package built with Nitro
+React Native SDK for [Mako](https://github.com/Gabriel-Pereira1788/mako) - Real-time debugging console for React Native.
 
-[![Version](https://img.shields.io/npm/v/react-native-nitro-trace.svg)](https://www.npmjs.com/package/react-native-nitro-trace)
-[![Downloads](https://img.shields.io/npm/dm/react-native-nitro-trace.svg)](https://www.npmjs.com/package/react-native-nitro-trace)
-[![License](https://img.shields.io/npm/l/react-native-nitro-trace.svg)](https://github.com/patrickkabwe/react-native-nitro-trace/LICENSE)
+[![npm version](https://img.shields.io/npm/v/mako-react-native.svg)](https://www.npmjs.com/package/mako-react-native)
+[![npm downloads](https://img.shields.io/npm/dm/mako-react-native.svg)](https://www.npmjs.com/package/mako-react-native)
+[![license](https://img.shields.io/npm/l/mako-react-native.svg)](https://github.com/Gabriel-Pereira1788/mako/blob/main/LICENSE)
 
 ## Requirements
 
-- React Native v0.76.0 or higher
-- Node 18.0.0 or higher
-
-> [!IMPORTANT]  
-> To Support `Nitro Views` you need to install React Native version v0.78.0 or higher.
+| Requirement | Version |
+|-------------|---------|
+| React Native | 0.73+ |
+| Node.js | 18+ |
 
 ## Installation
 
 ```bash
-npm install react-native-nitro-trace react-native-nitro-modules
+npm install mako-react-native react-native-nitro-modules
 ```
 
-## Credits
+For iOS, install pods:
 
-Bootstrapped with [create-nitro-module](https://github.com/patrickkabwe/create-nitro-module).
+```bash
+cd ios && pod install && cd ..
+```
 
-## Contributing
+For Android, the package will auto-link.
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## Usage
+
+Add the following code to your app's entry point (e.g., `App.tsx`):
+
+```typescript
+import { Mako } from 'mako-react-native';
+
+if (__DEV__) {
+  Mako.connect({
+    host: '192.168.1.100', // Your Mac's IP address
+    port: 8765,
+    enableNetworkCapture: true,
+  });
+}
+```
+
+> **Tip**: Use `localhost` for iOS Simulator, or your Mac's local IP for physical devices.
+
+## API
+
+### `Mako.connect(config?)`
+
+```typescript
+interface MakoConfig {
+  host?: string;                    // Default: 'localhost'
+  port?: number;                    // Default: 8765
+  enableNetworkCapture?: boolean;   // Default: true
+  ignoredUrls?: RegExp[];           // URL patterns to ignore
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  onError?: (error: Error) => void;
+}
+```
+
+### `Mako.disconnect()`
+
+Closes the WebSocket connection.
+
+### `Mako.isConnected()`
+
+Returns the current connection status.
+
+### Logging
+
+```typescript
+Mako.log('General message');
+Mako.debug('Debug info', { userId: 123 });
+Mako.info('Info message');
+Mako.warn('Warning message');
+Mako.error('Error message');
+```
+
+## MakoApp
+
+This SDK requires [MakoApp](https://github.com/Gabriel-Pereira1788/mako/releases) (macOS) to receive and display logs.
+
+For full documentation, visit the [main repository](https://github.com/Gabriel-Pereira1788/mako).
+
+## License
+
+MIT

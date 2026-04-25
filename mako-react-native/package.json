@@ -1,6 +1,6 @@
 {
   "name": "mako-react-native",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "description": "mako-react-native is a react native package built with Nitro",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",

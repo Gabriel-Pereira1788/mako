@@ -21,7 +21,7 @@ final class NetworkDetailViewModel {
 
     // MARK: - State
 
-    var selectedTab: NetworkDetailTab = .request
+    var selectedTab: NetworkDetailTab = .response
     var isLoadingBody = false
     var formattedRequestBodyAsync: String?
     var formattedResponseBodyAsync: String?

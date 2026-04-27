@@ -8,6 +8,7 @@ import SwiftUI
 struct NativeLogsView: View {
     @Bindable var viewModel: NativeLogsViewModel
     @Bindable var filterContext: FilterContext
+    @Environment(\.soundManager) private var soundManager
 
     private var filteredLogs: [LogEntry] {
         viewModel.logs.filter { entry in
@@ -112,6 +113,7 @@ struct NativeLogsView: View {
                         )
                         .onTapGesture {
                             viewModel.selectLog(entry)
+                            soundManager?.playDetailClick()
                         }
                 }
                 .listStyle(.plain)

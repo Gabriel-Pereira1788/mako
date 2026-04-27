@@ -8,6 +8,7 @@ import SwiftUI
 struct LogsView: View {
     @Bindable var viewModel: LogsViewModel
     @Bindable var filterContext: FilterContext
+    @Environment(\.soundManager) private var soundManager
 
     private var filteredLogs: [LogEntry] {
         viewModel.logs.filter { entry in
@@ -83,6 +84,7 @@ struct LogsView: View {
                         )
                         .onTapGesture {
                             viewModel.selectLog(entry)
+                            soundManager?.playDetailClick()
                         }
                 }
                 .listStyle(.plain)

@@ -61,5 +61,6 @@ struct MainView: View {
         .focusedValue(\.appCommands, viewModel.makeCommandActions(toggleInspector: {
             showRightSidebar.toggle()
         }))
+        .environment(\.soundManager, viewModel.soundManager)
     }
 }

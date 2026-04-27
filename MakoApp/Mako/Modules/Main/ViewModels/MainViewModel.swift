@@ -19,6 +19,7 @@ final class MainViewModel {
     private(set) var logStore: LogStore
     let workspaceState: WorkspaceState
     let filterManager: FilterManager
+    let soundManager: SoundManager
 
     // MARK: - State
 
@@ -54,6 +55,7 @@ final class MainViewModel {
         self.server = WebSocketServer()
         self.workspaceState = WorkspaceState()
         self.filterManager = FilterManager()
+        self.soundManager = SoundManager()
     }
 
     // MARK: - Lifecycle

@@ -8,6 +8,7 @@ import SwiftUI
 struct NetworkView: View {
     @Bindable var viewModel: NetworkViewModel
     @Bindable var filterContext: FilterContext
+    @Environment(\.soundManager) private var soundManager
 
     private var filteredEntries: [NetworkEntry] {
         viewModel.entries.filter { entry in
@@ -82,6 +83,7 @@ struct NetworkView: View {
                         )
                         .onTapGesture {
                             viewModel.selectEntry(entry)
+                            soundManager?.playDetailClick()
                         }
                 }
                 .listStyle(.plain)

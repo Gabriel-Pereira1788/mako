@@ -12,6 +12,7 @@ struct DeviceListView: View {
     @Binding var selectedDevice: Device?
     let onClearDevice: (Device) -> Void
 
+    @Environment(\.soundManager) private var soundManager
     @State private var selectedId: String?
 
     var body: some View {
@@ -30,6 +31,9 @@ struct DeviceListView: View {
         }
         .onChange(of: selectedId) { _, newId in
             selectedDevice = devices.first { $0.id == newId }
+            if newId != nil {
+                soundManager?.playDeviceClick()
+            }
         }
         .onChange(of: selectedDevice) { _, newDevice in
             selectedId = newDevice?.id

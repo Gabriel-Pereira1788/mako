@@ -20,10 +20,11 @@ struct ConnectionStatusView: View {
     private var serverStatus: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
-                Text("WebSocket")
+            if server.isRunning {
+                Text("\(server.connectedClients) client(s)")
                     .font(.caption)
-                    .bold()
-
+                    .foregroundStyle(.tertiary)
+            }
                 Spacer()
 
                 Circle()
@@ -35,11 +36,7 @@ struct ConnectionStatusView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if server.isRunning {
-                Text("\(server.connectedClients) client(s)")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
+
 
             if let error = server.lastError {
                 Text(error)

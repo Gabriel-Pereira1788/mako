@@ -51,7 +51,7 @@ final class SoundManager {
 
     private func loadSounds() {
         deviceClickPlayer = loadSound(named: "device_click")
-        detailClickPlayer = loadSound(named: "detail_click")
+        detailClickPlayer = loadSound(named: "detail_click2")
 
         deviceClickPlayer?.volume = 0.5
         detailClickPlayer?.volume = 0.4

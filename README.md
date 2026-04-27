@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/launch_icon_transparent.png" alt="Mako Logo" width="128" height="128" style="border-radius: 20px;">
+  <img src="assets/banner.png" alt="Mako Logo" width="1280" height="720" style="border-radius: 20px;">
 </p>
 
 <h1 align="center">Mako</h1>

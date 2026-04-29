@@ -44,23 +44,11 @@ module.exports = {
       },
     ],
     [
-      '@semantic-release/changelog',
+      '@semantic-release/github',
       {
-        changelogFile: 'CHANGELOG.md',
-      },
-    ],
-    [
-      '@semantic-release/exec',
-      {
-        prepareCmd: 'echo "Releasing MakoApp version ${nextRelease.version}"',
-      },
-    ],
-    '@semantic-release/github',
-    [
-      '@semantic-release/git',
-      {
-        assets: ['CHANGELOG.md', 'package.json'],
-        message: 'chore(release): makoapp ${nextRelease.version}',
+        assets: [
+          { path: '../Mako-*.dmg', label: 'Mako macOS App' },
+        ],
       },
     ],
   ],

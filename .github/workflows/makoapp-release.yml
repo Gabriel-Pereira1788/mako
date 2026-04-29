@@ -137,14 +137,8 @@ jobs:
             "Mako-${{ steps.version.outputs.version }}.dmg" \
             "MakoApp/build/Build/Products/Release/Mako.app"
 
-      - name: Release (creates tag and GitHub release)
+      - name: Release (creates tag, GitHub release, and uploads DMG)
         working-directory: MakoApp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
-
-      - name: Upload DMG to release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "makoapp-v${{ steps.version.outputs.version }}"
-          files: Mako-*.dmg

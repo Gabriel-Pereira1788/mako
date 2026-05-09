@@ -91,35 +91,51 @@ jobs:
         run: |
           APP_PATH="MakoApp/build/Build/Products/Release/Mako.app"
 
-          # Create zip for notarization
-          ditto -c -k --keepParent "$APP_PATH" Mako-notarize.zip
+          echo "Step 1: Verifying app exists"
+          ls -la "$APP_PATH" || { echo "ERROR: App not found"; exit 1; }
 
-          # Submit for notarization and capture submission ID
-          SUBMISSION_OUTPUT=$(xcrun notarytool submit Mako-notarize.zip \
+          echo "Step 2: Verifying code signature"
+          codesign -vvv --deep --strict "$APP_PATH" 2>&1 || { echo "ERROR: Signature invalid"; exit 1; }
+
+          echo "Step 3: Creating zip"
+          ditto -c -k --keepParent "$APP_PATH" Mako-notarize.zip
+          ls -la Mako-notarize.zip
+
+          echo "Step 4: Submitting to notarization"
+          xcrun notarytool submit Mako-notarize.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait 2>&1)
+            --wait 2>&1 | tee notarization-output.txt
+          NOTARY_EXIT_CODE=${PIPESTATUS[0]}
 
-          echo "$SUBMISSION_OUTPUT"
+          echo "Step 5: Notarization exit code: $NOTARY_EXIT_CODE"
+          echo "Step 6: Notarization output:"
+          cat notarization-output.txt
 
-          # Extract submission ID
-          SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
-
-          # Check if notarization was successful
-          if echo "$SUBMISSION_OUTPUT" | grep -q "status: Accepted"; then
-            echo "Notarization successful!"
-          else
-            echo "Notarization failed. Fetching log..."
-            xcrun notarytool log "$SUBMISSION_ID" \
-              --apple-id "$APPLE_ID" \
-              --password "$APPLE_ID_PASSWORD" \
-              --team-id "$APPLE_TEAM_ID"
+          if [ $NOTARY_EXIT_CODE -ne 0 ]; then
+            echo "ERROR: Notarization command failed"
             exit 1
           fi
 
-          # Staple the notarization ticket
+          if grep -q "status: Accepted" notarization-output.txt; then
+            echo "Step 7: Notarization successful!"
+          else
+            echo "ERROR: Notarization not accepted"
+            SUBMISSION_ID=$(grep "id:" notarization-output.txt | head -1 | awk '{print $2}')
+            if [ -n "$SUBMISSION_ID" ]; then
+              echo "Fetching notarization log for: $SUBMISSION_ID"
+              xcrun notarytool log "$SUBMISSION_ID" \
+                --apple-id "$APPLE_ID" \
+                --password "$APPLE_ID_PASSWORD" \
+                --team-id "$APPLE_TEAM_ID" 2>&1 || true
+            fi
+            exit 1
+          fi
+
+          echo "Step 8: Stapling"
           xcrun stapler staple "$APP_PATH"
+          echo "Done!"
 
       - name: Install create-dmg
         run: brew install create-dmg

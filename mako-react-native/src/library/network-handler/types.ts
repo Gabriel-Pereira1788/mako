@@ -1,4 +1,4 @@
-import type { NetworkRequestEvent, NetworkResponseEvent } from '../../types'
+import type { NetworkRequestEvent, NetworkResponseEvent } from '../types'
 
 export interface NetworkHandlerConfig {
   ignoredUrls: RegExp[]

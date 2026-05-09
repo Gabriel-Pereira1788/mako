@@ -120,7 +120,7 @@ export interface NetworkCallbacks {
   onResponse: (
     status: number,
     timeout: boolean,
-    response: string,
+    response: unknown,
     responseURL: string,
     responseType: string,
     xhr: XMLHttpRequest

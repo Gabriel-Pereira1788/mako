@@ -1,9 +1,3 @@
-/**
- * Network interceptors
- */
+import { XHRInterceptor } from './xhr'
 
-export {
-  enableNetworkInterception,
-  disableNetworkInterception,
-  isInterceptorEnabled,
-} from './xhr';
+export const xhrInterceptor = XHRInterceptor.getInstance()

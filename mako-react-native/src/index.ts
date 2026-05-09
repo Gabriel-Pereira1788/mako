@@ -4,4 +4,4 @@ import type { NitroMako as NitroMakoSpec } from './specs/mako.nitro'
 export const NitroMako =
   NitroModules.createHybridObject<NitroMakoSpec>('NitroMako')
 
-export { Mako } from './library'
+export { default } from './library'

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { Text, View, StyleSheet, Button } from 'react-native'
-import { Mako } from 'mako-react-native'
+import mako from 'mako-react-native'
+
 const streamingPlatform = {
-  id: "platform_001",
-  name: "NebulaStream",
-  version: "2.4.1",
-  environment: "production",
+  id: 'platform_001',
+  name: 'NebulaStream',
+  version: '2.4.1',
+  environment: 'production',
 
   features: {
     offlineMode: true,
@@ -14,7 +15,7 @@ const streamingPlatform = {
     parentalControl: false,
     subtitles: {
       enabled: true,
-      supportedLanguages: ["pt-BR", "en-US", "es-ES", "fr-FR"],
+      supportedLanguages: ['pt-BR', 'en-US', 'es-ES', 'fr-FR'],
     },
   },
 
@@ -28,16 +29,16 @@ const streamingPlatform = {
 
   users: [
     {
-      id: "user_001",
-      name: "Gabriel",
-      username: "gabsdev",
-      email: "gabriel@example.com",
+      id: 'user_001',
+      name: 'Gabriel',
+      username: 'gabsdev',
+      email: 'gabriel@example.com',
       verified: true,
-      roles: ["admin", "developer"],
+      roles: ['admin', 'developer'],
       preferences: {
-        theme: "dark",
+        theme: 'dark',
         autoplay: true,
-        language: "pt-BR",
+        language: 'pt-BR',
         notifications: {
           email: true,
           push: true,
@@ -46,18 +47,18 @@ const streamingPlatform = {
       },
       devices: [
         {
-          id: "device_iphone",
-          type: "mobile",
-          os: "iOS",
-          version: "18.0",
-          lastLogin: "2026-05-08T12:22:10Z",
+          id: 'device_iphone',
+          type: 'mobile',
+          os: 'iOS',
+          version: '18.0',
+          lastLogin: '2026-05-08T12:22:10Z',
         },
         {
-          id: "device_macbook",
-          type: "desktop",
-          os: "macOS",
-          version: "15.1",
-          lastLogin: "2026-05-08T13:11:02Z",
+          id: 'device_macbook',
+          type: 'desktop',
+          os: 'macOS',
+          version: '15.1',
+          lastLogin: '2026-05-08T13:11:02Z',
         },
       ],
       stats: {
@@ -69,16 +70,16 @@ const streamingPlatform = {
     },
 
     {
-      id: "user_002",
-      name: "Marina",
-      username: "marinacuts",
-      email: "marina@example.com",
+      id: 'user_002',
+      name: 'Marina',
+      username: 'marinacuts',
+      email: 'marina@example.com',
       verified: false,
-      roles: ["editor"],
+      roles: ['editor'],
       preferences: {
-        theme: "light",
+        theme: 'light',
         autoplay: false,
-        language: "en-US",
+        language: 'en-US',
         notifications: {
           email: true,
           push: false,
@@ -87,11 +88,11 @@ const streamingPlatform = {
       },
       devices: [
         {
-          id: "device_android",
-          type: "mobile",
-          os: "Android",
-          version: "15",
-          lastLogin: "2026-05-07T21:11:55Z",
+          id: 'device_android',
+          type: 'mobile',
+          os: 'Android',
+          version: '15',
+          lastLogin: '2026-05-07T21:11:55Z',
         },
       ],
       stats: {
@@ -105,18 +106,13 @@ const streamingPlatform = {
 
   videos: [
     {
-      id: "video_001",
-      title: "Building a React Native Video Engine",
-      category: "Technology",
+      id: 'video_001',
+      title: 'Building a React Native Video Engine',
+      category: 'Technology',
       durationSeconds: 1840,
-      publishedAt: "2026-04-28T18:00:00Z",
-      tags: [
-        "react-native",
-        "c++",
-        "video-streaming",
-        "performance",
-      ],
-      authorId: "user_001",
+      publishedAt: '2026-04-28T18:00:00Z',
+      tags: ['react-native', 'c++', 'video-streaming', 'performance'],
+      authorId: 'user_001',
       engagement: {
         likes: 12811,
         dislikes: 112,
@@ -125,28 +121,28 @@ const streamingPlatform = {
       },
       qualityOptions: [
         {
-          label: "360p",
+          label: '360p',
           bitrate: 800000,
         },
         {
-          label: "720p",
+          label: '720p',
           bitrate: 2500000,
         },
         {
-          label: "1080p",
+          label: '1080p',
           bitrate: 5000000,
         },
       ],
     },
 
     {
-      id: "video_002",
-      title: "SwiftUI Animations for macOS",
-      category: "Development",
+      id: 'video_002',
+      title: 'SwiftUI Animations for macOS',
+      category: 'Development',
       durationSeconds: 940,
-      publishedAt: "2026-03-11T10:30:00Z",
-      tags: ["swiftui", "macos", "animations"],
-      authorId: "user_002",
+      publishedAt: '2026-03-11T10:30:00Z',
+      tags: ['swiftui', 'macos', 'animations'],
+      authorId: 'user_002',
       engagement: {
         likes: 2811,
         dislikes: 14,
@@ -155,11 +151,11 @@ const streamingPlatform = {
       },
       qualityOptions: [
         {
-          label: "720p",
+          label: '720p',
           bitrate: 2200000,
         },
         {
-          label: "4K",
+          label: '4K',
           bitrate: 12000000,
         },
       ],
@@ -168,40 +164,40 @@ const streamingPlatform = {
 
   servers: [
     {
-      id: "srv_br_01",
-      region: "south-america",
+      id: 'srv_br_01',
+      region: 'south-america',
       location: {
-        country: "Brazil",
-        city: "São Paulo",
+        country: 'Brazil',
+        city: 'São Paulo',
         latitude: -23.55052,
         longitude: -46.633308,
       },
       specs: {
-        cpu: "AMD EPYC 9654",
+        cpu: 'AMD EPYC 9654',
         ramGb: 256,
         storageTb: 40,
         bandwidthGbps: 10,
       },
-      status: "online",
+      status: 'online',
       uptimeHours: 2211,
     },
 
     {
-      id: "srv_us_01",
-      region: "north-america",
+      id: 'srv_us_01',
+      region: 'north-america',
       location: {
-        country: "United States",
-        city: "Dallas",
+        country: 'United States',
+        city: 'Dallas',
         latitude: 32.7767,
         longitude: -96.797,
       },
       specs: {
-        cpu: "Intel Xeon Platinum",
+        cpu: 'Intel Xeon Platinum',
         ramGb: 512,
         storageTb: 80,
         bandwidthGbps: 40,
       },
-      status: "maintenance",
+      status: 'maintenance',
       uptimeHours: 9112,
     },
   ],
@@ -209,26 +205,26 @@ const streamingPlatform = {
   analytics: {
     topCountries: [
       {
-        country: "Brazil",
+        country: 'Brazil',
         users: 91231,
       },
       {
-        country: "United States",
+        country: 'United States',
         users: 42111,
       },
       {
-        country: "Germany",
+        country: 'Germany',
         users: 11821,
       },
     ],
 
     peakHours: [
       {
-        hour: "18:00",
+        hour: '18:00',
         concurrentUsers: 18211,
       },
       {
-        hour: "21:00",
+        hour: '21:00',
         concurrentUsers: 24112,
       },
     ],
@@ -244,21 +240,21 @@ const streamingPlatform = {
     jwtExpirationMinutes: 120,
     refreshTokenDays: 30,
     allowedOrigins: [
-      "https://app.nebulastream.com",
-      "https://studio.nebulastream.com",
+      'https://app.nebulastream.com',
+      'https://studio.nebulastream.com',
     ],
     rateLimit: {
       requestsPerMinute: 120,
       burst: 40,
     },
   },
-};
+}
 function App(): React.JSX.Element {
   useEffect(() => {
     if (__DEV__) {
-      Mako.connect({ host: '192.168.0.2' })
+      mako.connect({ host: '192.168.0.2' })
       setTimeout(() => {
-        Mako.log('FIRST-LOG')
+        mako.log('FIRST-LOG')
       }, 2000)
     }
   }, [])
@@ -270,7 +266,7 @@ function App(): React.JSX.Element {
         onPress={() => {
           fetch('https://jsonplaceholder.typicode.com/todos/1')
             .then(response => response.json())
-            .then(json => Mako.log("RESPONSE-API", streamingPlatform))
+            .then(json => mako.log('RESPONSE-API', streamingPlatform))
         }}
       />
     </View>

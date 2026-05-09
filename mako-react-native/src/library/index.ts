@@ -17,13 +17,13 @@
  * ```
  */
 
-import { client } from './client';
-import type { MakoConfig } from './types';
+import { client } from './client'
+import type { MakoConfig } from './types'
 
 /**
  * Mako SDK main interface
  */
-export const Mako = {
+export default {
   /**
    * Connect to Mako macOS app
    *
@@ -41,21 +41,21 @@ export const Mako = {
    * ```
    */
   connect(config?: MakoConfig): void {
-    client.connect(config);
+    client.connect(config)
   },
 
   /**
    * Disconnect from Mako macOS app
    */
   disconnect(): void {
-    client.disconnect();
+    client.disconnect()
   },
 
   /**
    * Check if currently connected to Mako
    */
   isConnected(): boolean {
-    return client.isConnected();
+    return client.isConnected()
   },
 
   /**
@@ -64,7 +64,7 @@ export const Mako = {
    * @param metadata - Optional metadata object
    */
   log(message: string, metadata?: Record<string, unknown>): void {
-    client.sendLog('info', message, metadata);
+    client.sendLog('info', message, metadata)
   },
 
   /**
@@ -73,7 +73,7 @@ export const Mako = {
    * @param metadata - Optional metadata object
    */
   debug(message: string, metadata?: Record<string, unknown>): void {
-    client.sendLog('debug', message, metadata);
+    client.sendLog('debug', message, metadata)
   },
 
   /**
@@ -82,7 +82,7 @@ export const Mako = {
    * @param metadata - Optional metadata object
    */
   info(message: string, metadata?: Record<string, unknown>): void {
-    client.sendLog('info', message, metadata);
+    client.sendLog('info', message, metadata)
   },
 
   /**
@@ -91,7 +91,7 @@ export const Mako = {
    * @param metadata - Optional metadata object
    */
   warn(message: string, metadata?: Record<string, unknown>): void {
-    client.sendLog('warn', message, metadata);
+    client.sendLog('warn', message, metadata)
   },
 
   /**
@@ -100,7 +100,7 @@ export const Mako = {
    * @param metadata - Optional metadata object
    */
   error(message: string, metadata?: Record<string, unknown>): void {
-    client.sendLog('error', message, metadata);
+    client.sendLog('error', message, metadata)
   },
 
   /**
@@ -108,7 +108,7 @@ export const Mako = {
    * Native log capture starts automatically on connect()
    */
   stopNativeLogCapture(): void {
-    client.stopNativeLogCapture();
+    client.stopNativeLogCapture()
   },
 
   /**
@@ -116,9 +116,9 @@ export const Mako = {
    * @returns true if native log capture is enabled
    */
   isNativeLogCaptureEnabled(): boolean {
-    return client.isNativeLogCaptureEnabled();
+    return client.isNativeLogCaptureEnabled()
   },
-};
+}
 
 // Export types for consumers
 export type {
@@ -131,7 +131,4 @@ export type {
   LogLevel,
   LogSource,
   NativeLogSource,
-} from './types';
-
-// Default export
-export default Mako;
+} from './types'

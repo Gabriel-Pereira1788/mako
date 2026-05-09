@@ -1,181 +1,123 @@
-/**
- * XHR Interceptor - Monkey-patches XMLHttpRequest to capture network requests
- *
- * Based on Reactotron's approach which is independent of React Native version.
- * Original source: https://github.com/infinitered/reactotron
- *
- * This approach works on ALL React Native versions (0.60+) because it patches
- * XMLHttpRequest directly instead of relying on RN's internal XHRInterceptor.
- */
-
 import type { NetworkCallbacks } from '../types';
 
-// Store original XMLHttpRequest methods
-const originalXHROpen = XMLHttpRequest.prototype.open;
-const originalXHRSend = XMLHttpRequest.prototype.send;
-const originalXHRSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+export class XHRInterceptor {
+  private static instance: XHRInterceptor | null = null;
 
-// Callback references
-let openCallback: ((method: string, url: string, xhr: XMLHttpRequest) => void) | null = null;
-let sendCallback: ((data: unknown, xhr: XMLHttpRequest) => void) | null = null;
-let requestHeaderCallback: ((header: string, value: string, xhr: XMLHttpRequest) => void) | null =
-  null;
-let headerReceivedCallback:
-  | ((
-      responseContentType: string | undefined,
-      responseSize: number | undefined,
-      allHeaders: string,
-      xhr: XMLHttpRequest
-    ) => void)
-  | null = null;
-let responseCallback:
-  | ((
-      status: number,
-      timeout: number,
-      response: string,
-      responseURL: string,
-      responseType: string,
-      xhr: XMLHttpRequest
-    ) => void)
-  | null = null;
+  private readonly originalOpen = XMLHttpRequest.prototype.open;
+  private readonly originalSend = XMLHttpRequest.prototype.send;
+  private readonly originalSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
-let interceptorEnabled = false;
+  private enabled = false;
 
-/**
- * Check if the interceptor is currently enabled
- */
-export function isInterceptorEnabled(): boolean {
-  return interceptorEnabled;
-}
+  private callbacks: {
+    onOpen?: NetworkCallbacks['onOpen'];
+    onSend?: NetworkCallbacks['onSend'];
+    onRequestHeader?: NetworkCallbacks['onRequestHeader'];
+    onHeaderReceived?: NetworkCallbacks['onHeaderReceived'];
+    onResponse?: NetworkCallbacks['onResponse'];
+  } = {};
 
-/**
- * Enable network interception with the provided callbacks
- */
-export function enableNetworkInterception(callbacks: NetworkCallbacks): boolean {
-  if (interceptorEnabled) {
-    console.warn('[Mako] Network interceptor already enabled');
-    return false;
+  public static getInstance(): XHRInterceptor {
+    if (!XHRInterceptor.instance) {
+      XHRInterceptor.instance = new XHRInterceptor();
+    }
+
+    return XHRInterceptor.instance;
   }
 
-  // Store callbacks
-  openCallback = callbacks.onOpen;
-  sendCallback = callbacks.onSend;
-  requestHeaderCallback = callbacks.onRequestHeader;
-  headerReceivedCallback = callbacks.onHeaderReceived;
-  responseCallback = (
-    status: number,
-    timeout: number,
-    response: string,
-    responseURL: string,
-    responseType: string,
-    xhr: XMLHttpRequest
-  ) => {
-    callbacks.onResponse(status, timeout > 0, response, responseURL, responseType, xhr);
-  };
+  public isEnabled(): boolean {
+    return this.enabled;
+  }
 
-  // Monkey-patch XMLHttpRequest.prototype.open
-  XMLHttpRequest.prototype.open = function (method: string, url: string | URL) {
-    if (openCallback) {
-      openCallback(method, url.toString(), this);
-    }
-    // @ts-ignore - apply with arguments
-    return originalXHROpen.apply(this, arguments);
-  };
-
-  // Monkey-patch XMLHttpRequest.prototype.setRequestHeader
-  XMLHttpRequest.prototype.setRequestHeader = function (header: string, value: string) {
-    if (requestHeaderCallback) {
-      requestHeaderCallback(header, value, this);
-    }
-    // @ts-ignore - apply with arguments
-    return originalXHRSetRequestHeader.apply(this, arguments);
-  };
-
-  // Monkey-patch XMLHttpRequest.prototype.send
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  XMLHttpRequest.prototype.send = function (data?: any) {
-    if (sendCallback) {
-      sendCallback(data, this);
+  public enable(callbacks: NetworkCallbacks): boolean {
+    if (this.enabled) {
+      console.warn('[Mako] Network interceptor already enabled');
+      return false;
     }
 
-    // Add event listener for state changes
-    if (this.addEventListener) {
-      this.addEventListener('readystatechange', () => {
-        if (!interceptorEnabled) {
-          return;
-        }
+    this.callbacks = callbacks;
 
-        // HEADERS_RECEIVED state
-        if (this.readyState === this.HEADERS_RECEIVED) {
-          const contentTypeString = this.getResponseHeader('Content-Type');
-          const contentLengthString = this.getResponseHeader('Content-Length');
+    XMLHttpRequest.prototype.open = function (
+      this: XMLHttpRequest,
+      method: string,
+      url: string | URL
+    ) {
+      XHRInterceptor.getInstance().callbacks.onOpen?.(method, url.toString(), this);
 
-          let responseContentType: string | undefined;
-          let responseSize: number | undefined;
+      return XHRInterceptor.getInstance().originalOpen.apply(this, arguments as any);
+    };
 
-          if (contentTypeString) {
-            responseContentType = contentTypeString.split(';')[0];
-          }
-          if (contentLengthString) {
-            responseSize = parseInt(contentLengthString, 10);
+    XMLHttpRequest.prototype.setRequestHeader = function (
+      this: XMLHttpRequest,
+      header: string,
+      value: string
+    ) {
+      XHRInterceptor.getInstance().callbacks.onRequestHeader?.(header, value, this);
+
+      return XHRInterceptor.getInstance().originalSetRequestHeader.apply(
+        this,
+        arguments as any
+      );
+    };
+
+    XMLHttpRequest.prototype.send = function (this: XMLHttpRequest, data?: unknown) {
+      const interceptor = XHRInterceptor.getInstance();
+
+      interceptor.callbacks.onSend?.(data, this);
+
+      if (this.addEventListener) {
+        this.addEventListener('readystatechange', () => {
+          if (!interceptor.enabled) {
+            return;
           }
 
-          if (headerReceivedCallback) {
-            headerReceivedCallback(
-              responseContentType,
-              responseSize,
+          if (this.readyState === this.HEADERS_RECEIVED) {
+            const contentType = this.getResponseHeader('Content-Type');
+            const contentLength = this.getResponseHeader('Content-Length');
+
+            interceptor.callbacks.onHeaderReceived?.(
+              contentType?.split(';')[0],
+              contentLength ? parseInt(contentLength, 10) : undefined,
               this.getAllResponseHeaders(),
               this
             );
           }
-        }
 
-        // DONE state
-        if (this.readyState === this.DONE) {
-          if (responseCallback) {
-            responseCallback(
+          if (this.readyState === this.DONE) {
+            interceptor.callbacks.onResponse?.(
               this.status,
-              this.timeout,
+              this.timeout > 0,
               this.response,
               this.responseURL,
               this.responseType,
               this
             );
           }
-        }
-      });
-    }
+        });
+      }
 
-    // @ts-ignore - apply with arguments
-    return originalXHRSend.apply(this, arguments);
-  };
+      return interceptor.originalSend.apply(this, arguments as any);
+    };
 
-  interceptorEnabled = true;
-  console.log('[Mako] Network interception enabled (XMLHttpRequest monkey-patch)');
-  return true;
-}
+    this.enabled = true;
 
-/**
- * Disable network interception and restore original XMLHttpRequest methods
- */
-export function disableNetworkInterception(): void {
-  if (!interceptorEnabled) {
-    return;
+    console.log('[Mako] Network interception enabled (XMLHttpRequest monkey-patch)');
+
+    return true;
   }
 
-  interceptorEnabled = false;
+  public disable(): void {
+    if (!this.enabled) {
+      return;
+    }
 
-  // Restore original methods
-  XMLHttpRequest.prototype.open = originalXHROpen;
-  XMLHttpRequest.prototype.send = originalXHRSend;
-  XMLHttpRequest.prototype.setRequestHeader = originalXHRSetRequestHeader;
+    XMLHttpRequest.prototype.open = this.originalOpen;
+    XMLHttpRequest.prototype.send = this.originalSend;
+    XMLHttpRequest.prototype.setRequestHeader = this.originalSetRequestHeader;
 
-  // Clear callbacks
-  openCallback = null;
-  sendCallback = null;
-  requestHeaderCallback = null;
-  headerReceivedCallback = null;
-  responseCallback = null;
+    this.callbacks = {};
+    this.enabled = false;
 
-  console.log('[Mako] Network interception disabled');
+    console.log('[Mako] Network interception disabled');
+  }
 }

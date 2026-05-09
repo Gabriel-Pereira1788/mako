@@ -96,14 +96,19 @@ struct NetworkDetailView: View {
 
     private var requestContent: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if let headers = viewModel.formattedRequestHeaders {
-                sectionWithCopy(title: "Headers", content: headers)
+            if let headers = viewModel.entry.requestHeaders {
+                DetailSection("Headers") {
+                    SyntaxHighlightedJSONView(json: headers)
+                }
             }
 
             if viewModel.isLoadingBody && viewModel.entry.requestBody != nil {
                 bodyLoadingView
-            } else if let body = viewModel.formattedRequestBodyAsync {
-                bodySectionWithCopy(title: "Body", content: body)
+            } else if let body = viewModel.entry.requestBody, viewModel.formattedRequestBodyAsync != nil {
+                DetailSection("Body") {
+                    SyntaxHighlightedJSONView(json: body)
+                        .frame(minHeight: 200)
+                }
             }
 
             if !viewModel.hasRequestData {
@@ -117,14 +122,19 @@ struct NetworkDetailView: View {
 
     private var responseContent: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if let headers = viewModel.formattedResponseHeaders {
-                sectionWithCopy(title: "Headers", content: headers)
+            if let headers = viewModel.entry.responseHeaders {
+                DetailSection("Headers") {
+                    SyntaxHighlightedJSONView(json: headers)
+                }
             }
 
             if viewModel.isLoadingBody && viewModel.entry.responseBody != nil {
                 bodyLoadingView
-            } else if let body = viewModel.formattedResponseBodyAsync {
-                bodySectionWithCopy(title: "Body", content: body)
+            } else if let body = viewModel.entry.responseBody, viewModel.formattedResponseBodyAsync != nil {
+                DetailSection("Body") {
+                    SyntaxHighlightedJSONView(json: body)
+                        .frame(minHeight: 200)
+                }
             }
 
             if !viewModel.hasResponseData {
@@ -152,69 +162,5 @@ struct NetworkDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .padding()
-    }
-
-    // MARK: - Reusable Components
-
-    private func sectionWithCopy(title: String, content: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.subheadline)
-                    .bold()
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Button {
-                    viewModel.copyToClipboard(content)
-                } label: {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .help("Copy to clipboard")
-            }
-
-            codeBlock(content)
-        }
-    }
-
-    private func codeBlock(_ content: String) -> some View {
-        Text(content)
-            .font(.system(.caption, design: .monospaced))
-            .textSelection(.enabled)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Color(nsColor: .textBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    private func bodySectionWithCopy(title: String, content: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.subheadline)
-                    .bold()
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Button {
-                    viewModel.copyToClipboard(content)
-                } label: {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .help("Copy to clipboard")
-            }
-
-            LargeTextView(text: content)
-                .frame(minHeight: 300, maxHeight: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
     }
 }

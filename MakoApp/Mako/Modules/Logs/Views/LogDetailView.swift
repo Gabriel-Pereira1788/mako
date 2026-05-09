@@ -91,13 +91,7 @@ struct LogDetailView: View {
     private var metadataSection: some View {
         if let metadata = log.metadata {
             DetailSection("Metadata") {
-                Text(JSONFormatter.format(metadata))
-                    .font(.system(.caption, design: .monospaced))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color(nsColor: .textBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                SyntaxHighlightedJSONView(json: metadata)
             }
         }
     }
